@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+
+import sys, argparse
+import urllib.request
+from urllib.parse import urljoin
+import logging
+
+from pyscrapebook.parser import HTML2TextParser
+
+parser = argparse.ArgumentParser(description="Scrape a book from a website, joining it's chapters.")
+parser.add_argument("url",
+                    help="URL to scrape content from.")
+parser.add_argument("-o", "--outfile",
+                    help="The path to the output file. Writing to stdout if not specified.")
+parser.add_argument("-t", "--tag",
+                    default="div",
+                    help="Tag name of the content container. Defaults to \"div\".")
+parser.add_argument("-i", "--id",
+                    default="content",
+                    help="Id of the content container. Defaults to \"content\".")
+parser.add_argument("-x", "--next",
+                    action="store_true",
+                    help="Parse for a subsequent url. By default, no further parsing is done.")
+parser.add_argument("-l", "--nextlabel",
+                    default=">>",
+                    help="Significant part of the label of the link to the next document's url. Defaults to \">>\".")
+args = parser.parse_args()
+
+logging.basicConfig(format="%(message)s", level=logging.INFO)
+
+outhandle = open(args.outfile, 'w+') if args.outfile else sys.stdout
+
+url = args.url
+docs = 0
+
+while True:
+    response = urllib.request.urlopen(url)
+    html = response.read()
+    html_parser = HTML2TextParser(
+        outhandle,
+        content_el = args.tag,
+        content_id = args.id,
+        next_url_label=args.nextlabel)
+    html_parser.feed(str(html))
+    docs = docs + 1
+
+    if (not args.next) or (not html_parser.next_url) or (html_parser.content_string == ""):
+        break
+    url = urljoin(url, html_parser.next_url)
+    logging.info("Next: " + url)
+    html_parser.close()
+    
+logging.info("Merged " + str(docs) + " documents.")
+
+if outhandle is not sys.stdout:
+    outhandle.close()
