@@ -21,7 +21,7 @@ parser.add_argument("-i", "--id",
 parser.add_argument("-x", "--next",
                     action="store_true",
                     help="Parse for a subsequent url. By default, no further parsing is done.")
-parser.add_argument("-l", "--nextlabel",
+parser.add_argument("-l", "--next-label",
                     default=">>",
                     help="Significant part of the label of the link to the next document's url. Defaults to \">>\".")
 args = parser.parse_args()
@@ -40,7 +40,7 @@ while True:
         outhandle,
         content_el = args.tag,
         content_id = args.id,
-        next_url_label=args.nextlabel)
+        next_url_label=args.next_label)
     html_parser.feed(str(html))
     docs = docs + 1
 
