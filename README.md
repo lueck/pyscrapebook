@@ -51,3 +51,7 @@ After installation run `scrapebook -h` on a terminal.
 							Significant part of the label of the link to the next
 							document's url. Defaults to ">>".
 
+
+For scraping a book from, e.g., `Projekt Gutenberg-DE` do:
+
+	$ scrapebook -x -i gutenb -o KdU.txt http://gutenberg.spiegel.de/buch/kritik-der-urteilskraft-3507/1
